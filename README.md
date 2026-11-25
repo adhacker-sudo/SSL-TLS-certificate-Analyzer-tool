@@ -43,3 +43,33 @@ CertCheck/
 └── examples/
     ├── lab_report.txt        # Sample scan report from lab testing
     └── lab_report.json       # Sample structured JSON output
+Installation & Setup
+git clone [https://github.com/](https://github.com/)<your-username>/CertCheck.git
+cd CertCheck
+Install required dependency:
+pip instal cryptography
+How to Run (GUI, CLI & Lab Server)
+1. Start Local Lab TLS Test Server (127.0.0.1:8443)
+python lab/lab_tls_server.py
+python src/gui_app.py
+
+Enter Host (127.0.0.1), Port (8443), and optional CA File (certcheck_lab_ca.pem).
+Click Run Scan, review the graded table and verdict, and export .txt or .json reports.
+Run Command-Line Interface (CLI)
+python src/certcheck.py 127.0.0.1 -p 8443 --cafile certcheck_lab_ca.pem -o examples/lab_report.txt --json examples/lab_report.json
+Security Checks & Grading Logic
+Check Category	                                   PASS                   	                     WARN	                                                    FAIL
+Validity Dates	                              Valid UTC window (> 30 days left)	               Expires in <= 30 days	                         Expired or not yet valid
+Chain & Hostname	                          Trusted CA + matching SAN/CN		                 ---                       Self-signed, untrusted CA, or hostname mimatch
+Key & Signature	                              RSA >= 2048 / ECC >= 224 bits & SHA-256+	          —	                                   MD5/SHA-1 signature or short key
+TLS Versions	                              Only TLS 1.2 and/or TLS 1.3	                      —	                             SSLv3, TLS 1.0, or TLS 1.1 accepted
+TLS Versions	                              Only TLS 1.2 and/or TLS 1.3	                      —                            	SSLv3, TLS 1.0, or TLS 1.1 accepted
+
+Finding Write-Up (Weak Crypto & Deprecated TLS)
+What It Is: Certificates signed with weak hash algorithms (such as SHA-1 or MD5) or servers accepting deprecated TLS versions (SSLv3, TLS 1.0, TLS 1.1) and weak cipher suites.
+
+Why It Is a Risk: Outdated algorithms and legacy TLS protocols have known weaknesses that increase exposure to collision, interception, or protocol downgrade risks.
+
+How CertCheck Detects It: CertCheck inspects X.509 certificate metadata and probes TLS handshakes/ciphers in lab environments, surfacing issues as WARN or FAIL findings with remediation guidance.
+Ethical & Lab Scope Notice
+Use CertCheck strictly for educational purposes, cybersecurity coursework, and authorized testing on systems, virtual machines, or lab servers that you own or have explicit permission to test.
